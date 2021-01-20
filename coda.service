@@ -1,0 +1,29 @@
+[Unit]
+Description=Mina Block Producer
+After=network.target
+StartLimitIntervalSec=60
+StartLimitBurst=3
+
+[Service]
+User=coda
+Group=coda
+EnvironmentFile=/home/coda/.mina-env
+Environment="RAYON_NUM_THREADS=20"
+Type=simple
+Restart=always
+RestartSec=15
+
+WorkingDirectory=/home/coda
+
+ExecStart=/usr/local/bin/coda daemon \
+  -super-catchup \
+  -peer-list-file /home/coda/peers.txt \
+  -generate-genesis-proof true \
+  -block-producer-key /home/coda/keys/my-wallet \
+  -log-level Info \
+  $EXTRA_FLAGS
+
+ExecStop=/usr/local/bin/coda client stop-daemon
+
+[Install]
+WantedBy=multi-user.target
